@@ -4,38 +4,25 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import ru.alte.notesappmvvm.database.room.AppRoomDatabase
+import ru.alte.notesappmvvm.database.room.repository.RoomRepository
 import ru.alte.notesappmvvm.model.Note
+import ru.alte.notesappmvvm.utils.REPOSITORY
 import ru.alte.notesappmvvm.utils.TYPE_FIREBASE
 import ru.alte.notesappmvvm.utils.TYPE_ROOM
 
-class MainViewModel(application: Application): AndroidViewModel(application) {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    val readTest: MutableLiveData<List<Note>> by lazy {
-        MutableLiveData<List<Note>>()
-    }
+    private val context = application
 
-    val dbType: MutableLiveData<String> by lazy {
-        MutableLiveData<String>(TYPE_ROOM)
-    }
-
-    init {
-        readTest.value =
-            when(dbType.value) {
-                TYPE_ROOM -> {
-                    listOf<Note>(
-                        Note(title = "Note1", subtitle = "Subtitle for Note1"),
-                        Note(title = "Note2", subtitle = "Subtitle for Note2"),
-                        Note(title = "Note3", subtitle = "Subtitle for Note3"),
-                        Note(title = "Note4", subtitle = "Subtitle for Note4")
-                    )
-                }
-                TYPE_FIREBASE -> listOf()
-                else -> listOf()
-            }
-    }
-
-    fun initDatabase(type: String) {
-        dbType.value = type
+    fun initDatabase(type: String, onSuccess: () -> Unit) {
         Log.d("MyLog", "MainViewModel with type: $type")
+        when (type) {
+            TYPE_ROOM -> {
+                val dao = AppRoomDatabase.getInstance(context = context).getRoomDao()
+                REPOSITORY = RoomRepository(dao)
+                onSuccess()
+            }
+        }
     }
 }
