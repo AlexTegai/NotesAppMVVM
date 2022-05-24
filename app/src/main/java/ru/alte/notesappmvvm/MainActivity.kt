@@ -36,7 +36,8 @@ class MainActivity : ComponentActivity() {
                         ) {
                             NotesNavHost()
                         }
-                    })
+                    }
+                )
             }
         }
     }
